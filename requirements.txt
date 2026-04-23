@@ -1,0 +1,29 @@
+# Core (demo + inference)
+torch
+torchvision
+numpy
+scipy
+einops
+roma
+tqdm
+matplotlib
+opencv-python
+trimesh
+pyglet<2
+gradio
+huggingface-hub[torch]>=0.22
+# Hugging Face ZeroGPU runtime (no-op on local installs; required on HF Spaces).
+spaces
+
+# SAB3R distillation heads
+ftfy
+regex
+# FeatUp is only on GitHub — on HF Spaces we rely on pre-requirements or on a build step.
+# For local installs, see README: `pip install git+https://github.com/mhamilton723/FeatUp`
+
+# Training extras (safe to keep — pulled in by train.py)
+scikit-learn
+wandb
+deepspeed
+hydra-core
+tensorboard

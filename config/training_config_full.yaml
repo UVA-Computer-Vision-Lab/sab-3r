@@ -1,0 +1,57 @@
+seed: 8
+
+# Full SAB3R training recipe (CLIP + DINO distillation on Habitat + ScanNet++ + ARKitScenes + Co3D).
+# Override these paths via hydra (e.g. `python train.py --config-name training_config_full dataset_url=/path/to/data`)
+# or by editing this file.
+dataset_url: "./data"
+code_url: "."
+output_url: "./outputs"
+
+model:
+  name: "AsymmetricMASt3R(pos_embed='RoPE100', patch_embed_cls='ManyAR_PatchEmbed', img_size=(512, 512), head_type='catmlp+dpt', output_mode='pts3d+desc24', clip_head_type='dpt', dino_head_type='dpt', depth_mode=('exp', -inf, inf), conf_mode=('exp', 1, inf), enc_embed_dim=1024, enc_depth=24, enc_num_heads=16, dec_embed_dim=768, dec_depth=12, dec_num_heads=12, two_confs=True)"
+  pretrained: "checkpoints/MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric.pth"
+
+
+clip_checkpoint_weights_path: "checkpoints/maskclip_jbu_stack_cocostuff.ckpt"
+dino_checkpoint_weights_path: "checkpoints/dinov2_jbu_stack_cocostuff.ckpt"
+
+train_criterion: "ConfFeatLoss(Regr3D(L21, norm_mode='?avg_dis'), alpha=1, beta=20, gamma=4, need_clip=True, need_dino=True, need_mask=False, clip_checkpoint_weights_path='${clip_checkpoint_weights_path}', dino_checkpoint_weights_path='${dino_checkpoint_weights_path}') + 0.75*ConfMatchingLoss(MatchingLoss(InfoNCE(mode='proper', temperature=0.05), negatives_padding=0, blocksize=8192), alpha=10.0, confmode='mean')"
+test_criterion: "FeatRegr3D_ScaleShiftInv(L21, norm_mode='?avg_dis', need_clip=True, need_dino=True, gt_scale=True, sky_loss_value=0, clip_checkpoint_weights_path='${clip_checkpoint_weights_path}', dino_checkpoint_weights_path='${dino_checkpoint_weights_path}') + -1.*MatchingLoss(APLoss(nq='torch', fp=torch.float16), negatives_padding=12288)"
+
+dataset:
+  train: "57_000 @ Habitat512(1_000_000, split='train', ROOT='${dataset_url}/habitat_processed', resolution=[(512, 384), (512, 336), (512, 288), (512, 256), (512, 160)], aug_crop='auto', aug_monocular=0.005, transform=ColorJitter, n_corres=8192, nneg=0.5) + 45_600 @ ScanNetpp(split='train', ROOT='${dataset_url}/scannetpp_processed', resolution=[(512, 384), (512, 336), (512, 288), (512, 256), (512, 160)], aug_crop='auto', aug_monocular=0.005, transform=ColorJitter, n_corres=8192, nneg=0.5) + 45_600 @ ARKitScenes(split='train', ROOT='${dataset_url}/arkitscenes_processed', resolution=[(512, 384), (512, 336), (512, 288), (512, 256), (512, 160)], aug_crop='auto', aug_monocular=0.005, transform=ColorJitter, n_corres=8192, nneg=0.5) + 22_800 @ Co3d(split='train', ROOT='${dataset_url}/co3d_50_seqs_per_category_subset_processed', aug_crop='auto', aug_monocular=0.005, aug_rot90='diff', mask_bg='rand', resolution=[(512, 384), (512, 336), (512, 288), (512, 256), (512, 160)], n_corres=8192, nneg=0.5, transform=ColorJitter)"
+  test: "100 @ Co3d(split='test', ROOT='${dataset_url}/co3d_50_seqs_per_category_subset_processed', resolution=(512,384), n_corres=1024, seed=777)"
+
+training:
+  epochs: 5
+  disable_cudnn_benchmark: true
+  print_freq: 1
+
+saving:
+  save_freq: 1
+  keep_freq: 1
+  eval_freq: 1
+  save_steps: 5000
+  plot_steps: 200
+
+output_dir: "${output_url}/sab3r_full"
+
+wandb:
+  project_name: "sab3r"
+  entity: "uva-computer-vision-lab"
+  group: "sab3r_full"
+
+num_workers: 8
+dist_url: "env://"
+distributed: True
+
+world_size: -1
+gpu: -1
+rank: -1
+dist_backend: "nccl"
+
+resume: ""
+start_epoch: 0
+disable_cudnn_benchmark: True
+amp: 0
+deepspeed_config: "${code_url}/config/deepspeed.json"
