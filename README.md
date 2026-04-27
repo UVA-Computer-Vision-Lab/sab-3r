@@ -4,7 +4,7 @@
 
 **3D-LLM/VLA Workshop @ CVPR 2025**
 
-[**Xuweiyi Chen**](https://xuweiyichen.github.io/)<sup>*,1</sup> · [**Tian Xia**](https://tianx-ia.github.io/)<sup>*,2</sup> · [**Sihan Xu**](https://sihanxu.github.io/)<sup>2</sup> · [**Jed Jianing Yang**](https://jedyang.com/)<sup>2</sup> · [**Joyce Chai**](https://web.eecs.umich.edu/~chaijy/)<sup>2</sup> · [**Zezhou Cheng**](https://sites.google.com/site/zezhoucheng/)<sup>1</sup>
+[**Xuweiyi Chen**](https://xuweiyichen.github.io/)<sup>* 1</sup> · [**Tian Xia**](https://tianx-ia.github.io/)<sup>* 2</sup> · [**Sihan Xu**](https://sihanxu.github.io/)<sup>2</sup> · [**Jed Jianing Yang**](https://jedyang.com/)<sup>2</sup> · [**Joyce Chai**](https://web.eecs.umich.edu/~chaijy/)<sup>2</sup> · [**Zezhou Cheng**](https://sites.google.com/site/zezhoucheng/)<sup>1</sup>
 
 <sup>1</sup>University of Virginia · <sup>2</sup>University of Michigan
 
